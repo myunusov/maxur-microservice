@@ -18,7 +18,10 @@ before_install:
  - chmod +x ./mvnw
 
 script:
-  - mvn clean verify -Denv=dev -Pdebug
+  - mvn clean verify -Denv=dev -Pdebug,dep-jacoco
+
+after_success:
+  - mvn -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID coveralls:report
 
 notifications:
   slack: maxur:bIyYFLYJ0n1toR66dIr5OSbD
