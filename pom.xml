@@ -27,6 +27,8 @@
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
+
+        <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
     </properties>
 
     <url>https://github.com/myunusov/maxur-mserv.git</url>
@@ -53,6 +55,121 @@
         <module>maxur-mserv-sample</module>
         <module>maxur-mserv-java-sample</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>dep-jacoco</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>pre-unit-test</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                                    <propertyName>surefireArgLine</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>post-unit-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                                    <outputDirectory>${unit.tests.coverage.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>pre-integration-test</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                                    <propertyName>failsafeArgLine</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>post-integration-test</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+                                    <outputDirectory>${integration.tests.coverage.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!--suppress MavenModelInspection -->
+                            <argLine>${surefireArgLine}</argLine>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <perCoreThreadCount>true</perCoreThreadCount>
+                            <threadCount>1</threadCount>
+                            <!--suppress MavenModelInspection -->
+                            <argLine>${failsafeArgLine}</argLine>
+                        </configuration>
+
+                    </plugin>
+                </plugins>
+            </build>
+
+            <reporting>
+                <excludeDefaults>true</excludeDefaults>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco-maven-plugin.version}</version>
+                        <reportSets>
+                            <reportSet>
+                                <inherited>true</inherited>
+                                <reports>
+                                    <report>report</report>
+                                </reports>
+                                <configuration>
+                                    <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                                    <outputDirectory>${unit.tests.coverage.output.directory}</outputDirectory>
+                                </configuration>
+                            </reportSet>
+                            <reportSet>
+                                <inherited>true</inherited>
+                                <reports>
+                                    <report>report</report>
+                                </reports>
+                                <configuration>
+                                    <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+                                    <outputDirectory>${integration.tests.coverage.output.directory}</outputDirectory>
+                                </configuration>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
 
     <build>
         <pluginManagement>
@@ -104,6 +221,7 @@
                         </execution>
                     </executions>
                 </plugin>
+                
             </plugins>
         </pluginManagement>
     </build>
