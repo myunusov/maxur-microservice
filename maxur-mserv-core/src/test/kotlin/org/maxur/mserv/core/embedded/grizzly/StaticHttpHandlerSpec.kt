@@ -10,8 +10,6 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
-import org.maxur.mserv.core.Locator
-import org.maxur.mserv.core.TestLocatorHolder
 import org.maxur.mserv.core.embedded.properties.WebAppProperties
 
 @RunWith(JUnitPlatform::class)
@@ -19,10 +17,6 @@ class StaticHttpHandlerSpec : Spek({
 
     describe("a StaticHttpHandler") {
 
-        beforeEachTest {
-            Locator.holder = TestLocatorHolder
-        }
-        
         on("Create StaticHttpHandler on folder by classpath") {
             it("should return new StaticHttpHandler instance") {
                 val handler = StaticHttpHandler("web", "classpath:/web/")
